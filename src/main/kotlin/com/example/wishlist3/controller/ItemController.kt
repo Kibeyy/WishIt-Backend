@@ -2,6 +2,7 @@ package com.example.wishlist3.controller
 
 import com.example.wishlist3.model.Item
 import com.example.wishlist3.service.ItemService
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/items")
-class ItemController(private val itemService: ItemService) {
+class ItemController(
+    private val itemService: ItemService,
+    private val messagingTemplate: SimpMessagingTemplate
+) {
 
     @GetMapping
     fun getItems():List<Item>{
@@ -22,11 +26,13 @@ class ItemController(private val itemService: ItemService) {
     @PostMapping
     fun addItem(@RequestBody item: Item): Item {
         return itemService.addItem(item.name)
+        messagingTemplate.convertAndSend("/topic/items", itemService.getItems())
     }
 
     @DeleteMapping("/{id}")
     fun deleteItem(@PathVariable id: Long): String {
         itemService.deleteItem(id)
+        messagingTemplate.convertAndSend("/topic/items", itemService.getItems())
         return "Item deleted"
     }
 
