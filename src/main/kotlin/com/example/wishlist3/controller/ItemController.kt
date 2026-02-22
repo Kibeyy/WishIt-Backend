@@ -25,8 +25,10 @@ class ItemController(
 
     @PostMapping
     fun addItem(@RequestBody item: Item): Item {
-        return itemService.addItem(item.name)
+        val saved = itemService.addItem(item.name)
+        println("Broadcasting to /topic/items")
         messagingTemplate.convertAndSend("/topic/items", itemService.getItems())
+        return saved
     }
 
     @DeleteMapping("/{id}")
