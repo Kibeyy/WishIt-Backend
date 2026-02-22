@@ -15,8 +15,12 @@ class ItemService(private val itemRepository: ItemRepository) {
         return itemRepository.save(Item(name = name))
     }
 
-    fun deleteItem(id:Long){
-        itemRepository.deleteById(id)
+    fun deleteItem(id: Long) {
+        try {
+            itemRepository.deleteById(id)
+        } catch (e: Exception) {
+            println("Item already deleted: ${e.message}")
+        }
     }
 
 }
